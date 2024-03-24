@@ -1,0 +1,54 @@
+<!-- index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-Do List</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js"></script>
+</head>
+<body>
+  <h1>To-Do List</h1>
+  <input type="text" id="taskInput" placeholder="Add new task...">
+  <button id="addTaskBtn">Add Task</button>
+  <ul id="taskList"></ul>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const taskInput = document.getElementById('taskInput');
+      const addTaskBtn = document.getElementById('addTaskBtn');
+      const taskList = document.getElementById('taskList');
+
+      addTaskBtn.addEventListener('click', function() {
+        const taskText = taskInput.value.trim();
+        if (taskText !== '') {
+          fetch('/todos', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ task: taskText })
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Failed to add task');
+            }
+            return response.json();
+          })
+          .then(() => {
+            const li = document.createElement('li');
+            li.textContent = taskText;
+            taskList.appendChild(li);
+            taskInput.value = '';
+          })
+          .catch(error => {
+            console.error('Error adding task:', error);
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
